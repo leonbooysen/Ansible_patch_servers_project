@@ -84,11 +84,11 @@
             update_cache: yes
           when: ansible_os_family == "Debian"
 
-        - name: Perform system updates (SUSE)
-          zypper:
-            name: "*"
-            state: latest
-          when: ansible_os_family == "Suse"
+        #- name: Perform system updates (SUSE)
+        #  zypper:
+        #    name: "*"
+        #    state: latest
+        #  when: ansible_os_family == "Suse"
 
         - name: Check if reboot is required
           stat:
