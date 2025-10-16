@@ -49,10 +49,10 @@
             update_cache: yes
           when: ansible_os_family == "Debian"
 
-        - name: Update package cache (SUSE)
-          zypper:
-            update_cache: yes
-          when: ansible_os_family == "Suse"
+        #- name: Update package cache (SUSE)
+        #  zypper:
+        #    update_cache: yes
+        #  when: ansible_os_family == "Suse"
 
         - name: Check current Amazon Linux version
           shell: cat /etc/system-release
