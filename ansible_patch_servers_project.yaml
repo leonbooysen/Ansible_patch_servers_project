@@ -16,13 +16,13 @@
     failed_servers: []
 
   pre_tasks:
-    - name: Create results directory
-      file:
-        path: "/tmp/patch_results"
-        state: directory
-        mode: '0755'
-      delegate_to: localhost
-      run_once: true
+    #- name: Create results directory
+    #  file:
+    #    path: "/tmp/patch_results"
+    #    state: directory
+    #    mode: '0755'
+    #  delegate_to: localhost
+    #  run_once: true
 
     - name: Initialize patch status
       set_fact:
