@@ -115,17 +115,17 @@
         - name: Set reboot required fact
           set_fact:
             #reboot_required: "{{ true if reboot_required_file.stat.exists else (true if reboot_required_rh.stdout == 'true' else false) }}"
-            #reboot_required: "true"
-            reboot_required: "false"
+            reboot_required: "true"
+            #reboot_required: "false"
 
-        - name: Save pre-patch package versions
-          shell: |
-            if command -v rpm &> /dev/null; then
-              rpm -qa --queryformat '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /tmp/pre_patch_packages.txt
-            elif command -v dpkg &> /dev/null; then
-              dpkg-query -W -f='${Package}-${Version}-${Architecture}\n' | sort > /tmp/pre_patch_packages.txt
-            fi
-          args:
+        #- name: Save pre-patch package versions
+        #  shell: |
+        #    if command -v rpm &> /dev/null; then
+        #      rpm -qa --queryformat '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /tmp/pre_patch_packages.txt
+        #    elif command -v dpkg &> /dev/null; then
+        #      dpkg-query -W -f='${Package}-${Version}-${Architecture}\n' | sort > /tmp/pre_patch_packages.txt
+        #    fi
+        #  args:
 
       rescue:
         - name: Mark server as failed during patching
@@ -184,44 +184,44 @@
 
       when: server_status == "reachable"
 
-    - name: Verify patches were applied
-      block:
-        - name: Save post-patch package versions
-          shell: |
-            if command -v rpm &> /dev/null; then
-              rpm -qa --queryformat '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /tmp/post_patch_packages.txt
-            elif command -v dpkg &> /dev/null; then
-              dpkg-query -W -f='${Package}-${Version}-${Architecture}\n' | sort > /tmp/post_patch_packages.txt
-            fi
-          args:
+    #- name: Verify patches were applied
+    #  block:
+    #    - name: Save post-patch package versions
+    #      shell: |
+    #        if command -v rpm &> /dev/null; then
+    #          rpm -qa --queryformat '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /tmp/post_patch_packages.txt
+    #        elif command -v dpkg &> /dev/null; then
+    #          dpkg-query -W -f='${Package}-${Version}-${Architecture}\n' | sort > /tmp/post_patch_packages.txt
+    #        fi
+    #      args:
+ 
+    #    - name: Compare package versions
+    #      shell: |
+    #        diff /tmp/pre_patch_packages.txt /tmp/post_patch_packages.txt || true
+    #      register: package_diff
+    #      args:
 
-        - name: Compare package versions
-          shell: |
-            diff /tmp/pre_patch_packages.txt /tmp/post_patch_packages.txt || true
-          register: package_diff
-          args:
+    #    - name: Set patch verification status
+    #      set_fact:
+    #        patches_applied: "{{ true if package_diff.stdout != '' else false }}"
 
-        - name: Set patch verification status
-          set_fact:
-            patches_applied: "{{ true if package_diff.stdout != '' else false }}"
+    #    - name: Get kernel version (if updated)
+    #      shell: uname -r
+    #      register: kernel_version
 
-        - name: Get kernel version (if updated)
-          shell: uname -r
-          register: kernel_version
+    #    - name: Save verification results
+    #      copy:
+    #        content: |
+    #          Host: {{ inventory_hostname }}
+    #          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+    #          Packages Updated: {{ patches_applied }}
+    #          Kernel: {{ kernel_version.stdout }}
+    #          Rebooted: {{ reboot_required | default(false) }}
+    #          Status: SUCCESS
+    #        dest: "/tmp/patch_results/{{ inventory_hostname }}_success.txt"
+    #      delegate_to: localhost
 
-        - name: Save verification results
-          copy:
-            content: |
-              Host: {{ inventory_hostname }}
-              OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
-              Packages Updated: {{ patches_applied }}
-              Kernel: {{ kernel_version.stdout }}
-              Rebooted: {{ reboot_required | default(false) }}
-              Status: SUCCESS
-            dest: "/tmp/patch_results/{{ inventory_hostname }}_success.txt"
-          delegate_to: localhost
-
-      when: server_status == "reachable"
+    #  when: server_status == "reachable"
 
 
   handlers:
