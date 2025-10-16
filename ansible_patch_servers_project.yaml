@@ -223,47 +223,6 @@
 
       when: server_status == "reachable"
 
-  post_tasks:
-    - name: Collect success servers
-      set_fact:
-        success_servers: "{{ success_servers + [inventory_hostname] }}"
-      when: server_status == "reachable"
-
-    - name: Collect failed servers
-      set_fact:
-        failed_servers: "{{ failed_servers + [inventory_hostname] }}"
-      when: server_status != "reachable"
-
-    - name: Generate summary report
-      template:
-        src: patch_report.j2
-        dest: "/tmp/patch_results/patch_summary.txt"
-      delegate_to: localhost
-      run_once: true
-
-    - name: Send email notification
-      community.general.mail:
-        host: "{{ mail_host }}"
-        port: "{{ mail_port }}"
-        username: "{{ mail_username }}"
-        password: "{{ mail_password }}"
-        to: "{{ mail_to }}"
-        from: "{{ mail_from }}"
-        subject: "Patch Management Completed - {{ ansible_date_time.iso8601 }}"
-        #body: "{{ lookup('file', '/tmp/patch_results/patch_summary.txt') }}"
-        body: "
-          Ansible Playbook Run Summary:
-
-          Status: {{ ansible_play_result.changed | ternary('Changed', 'No Change') }}
-          Tasks Succeeded: {{ ansible_play_result.ok | default(0) }}
-          Tasks Failed: {{ ansible_play_result.failed | default(0) }}
-          Tasks Skipped: {{ ansible_play_result.skipped | default(0) }}
-          Tasks Unreachable: {{ ansible_play_result.unreachable | default(0) }}
-
-          For more details, check the logs on the control machine. "
-        secure: starttls
-      delegate_to: localhost
-      run_once: true
 
   handlers:
     - name: reboot server
